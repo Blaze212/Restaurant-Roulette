@@ -3,6 +3,8 @@ package com.example.andriod.restaurant_roulette;
 import android.app.IntentService;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Bundle;
+import android.os.ResultReceiver;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -16,7 +18,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 
 
 /**
@@ -45,7 +46,9 @@ public class getRestaurants extends IntentService  {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        Log.d("SENT", intent.getData().toString());
+        Log.d(LOG_TAG, intent.getData().toString());
+
+        ResultReceiver rec = intent.getParcelableExtra("receiverTag");
 
         if (intent != null) {
             final String action = intent.getAction();
@@ -58,6 +61,15 @@ public class getRestaurants extends IntentService  {
                     ArrayList<String> ids = nameID.get(1);
                     int myPlaceIndex = (int) Math.floor(Math.random() * names.size());
                     String myPlace = names.get(myPlaceIndex);
+                    String myID = ids.get(myPlaceIndex);
+
+                    Log.d(LOG_TAG,"sending data back to activity");
+
+                    Bundle b= new Bundle();
+                    b.putString("restaurant",myPlace);
+                    b.putString("id", myID);
+                    rec.send(0, b);
+
                     //return myPlace;
                     //comment
 

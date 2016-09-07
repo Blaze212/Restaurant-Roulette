@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+
+
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        tools:context="com.example.android.Restaurant_Roulette.app.MainActivity">
+
+    <item
+        android:id="@+id/settings"
+        android:title="@string/settings_name"
+        android:orderInCategory="100"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/food_categories"
+        android:title="@string/food_categories"
+        app:showAsAction="never" />
+
+
+
+</menu>

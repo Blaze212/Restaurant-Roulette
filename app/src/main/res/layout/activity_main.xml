@@ -9,6 +9,8 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="com.example.andriod.restaurant_roulette.MainActivity">
 
+
+
     <TextView
         android:id="@+id/title"
         android:text="Restaurant Roulette"
@@ -49,6 +51,15 @@
         android:layout_centerHorizontal="true"
         android:padding="8dp"
         />
+
+    <TextView
+        android:id="@+id/txt_picked_restaurant"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="Display Here"
+        android:layout_above="@+id/btn_search"
+        android:layout_centerHorizontal="true" />
 
 
 </RelativeLayout>

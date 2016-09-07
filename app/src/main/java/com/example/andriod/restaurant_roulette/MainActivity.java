@@ -9,22 +9,27 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CheckBox;
+import android.widget.TextView;
 
 import java.io.IOException;
 
 // API Key - AIzaSyC5V0sUyvMudH7dHu57uWICoJ3hjt7dQTc
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MyResultReceiver.Receiver {
     Location location;
     String locationStr = "fort worth ";
     String APIkey = "AIzaSyC5V0sUyvMudH7dHu57uWICoJ3hjt7dQTc";
     String LOG_TAG = this.getClass().toString();
+
+    public MyResultReceiver mReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,46 +40,57 @@ public class MainActivity extends AppCompatActivity {
         final Button button = (Button) findViewById(R.id.btn_search);
         button.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                String searchTerm = getCheckedSearchTerms();
+                FoodPreferences foods = new FoodPreferences();
+                String searchTerm = foods.getCheckedSearchTerms();
                 search(v, searchTerm);
                 Log.d(LOG_TAG,"Search clicked");
             }
         });
+
+        mReceiver = new MyResultReceiver(new Handler());
+        mReceiver.setReceiver(this);
+
     }
 
-    public String getCheckedSearchTerms(){
-        String searchTerm = "";
-        String notChecked = "";
-        CheckBox[] checkBoxes = new CheckBox[2];
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main_settings, menu);
 
-        CheckBox chkFastFood = (CheckBox)findViewById(R.id.chk_fastfood);
-        CheckBox chkFancyRest= (CheckBox)findViewById(R.id.chk_fancy);
-        checkBoxes[0] = chkFancyRest;
-        checkBoxes[1] = chkFastFood;
+        return true;
+    }
 
-        for(int i = 0; i<checkBoxes.length;i++){
-            if(checkBoxes[i].isChecked()){
-                searchTerm += checkBoxes[i].getText();
-            }
-            if(!checkBoxes[i].isChecked()){
-                notChecked += " -" + checkBoxes[i].getText();
-            }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.settings) {
+            //startActivity(new Intent(this,SettingsActivity.class));
+            return true;
         }
-        searchTerm += notChecked;
-        Log.d("SearchTerm",searchTerm);
-        return searchTerm;
+        if (id == R.id.food_categories) {
+            startActivity(new Intent(this,FoodPreferences.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
+
 
     public void search(View view, String searchTerm){
         //launchMap(searchTerm);
         Log.d(LOG_TAG, "Searching: ");
         try {
-            Log.d(LOG_TAG, "try Searching: ");
+            Log.d(LOG_TAG, "try Searching: " + searchTerm);
             Uri uri = buildUri(searchTerm, "location", "maxprice", "radius");
             Log.d(LOG_TAG, "URI " + uri.toString() );
             Intent intent  = new Intent(this, getRestaurants.class);
             intent.setData(uri);
             intent.setAction("com.example.android.restaurant_roulette.action.GET_RESTAURANTS");
+            intent.putExtra("receiverTag", mReceiver);
             startService(intent);
         }
         catch (IOException e){
@@ -145,6 +161,21 @@ public class MainActivity extends AppCompatActivity {
 
         return uri;
     }
+
+    @Override
+    public void onReceiveResult(int resultCode, Bundle resultData) {
+
+        if(resultCode == 0){
+            String restaurant = resultData.getString("restaurant");
+            TextView t = (TextView) findViewById(R.id.txt_picked_restaurant);
+            t.setText(restaurant);
+        }
+
+        Log.d("Reciever","received result from Service="+resultData.getString("ServiceTag"));
+
+    }
+
+
 
 
 }
